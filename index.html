@@ -98,6 +98,41 @@
   .play:hover{filter:brightness(1.18); transform:translateY(-1px);}
   .play:disabled{filter:grayscale(1) brightness(.6); cursor:not-allowed; transform:none;}
 
+  /* ---------- leaderboard ---------- */
+  #lbWrap{margin-top:30px;}
+  .lb-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .lb-title{font-size:13px; letter-spacing:.24em; color:var(--cyan);}
+  .lb-tabs{display:flex; gap:8px; flex-wrap:wrap;}
+  .lb-tab{
+    font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:.14em; cursor:pointer;
+    color:var(--ink-dim); background:rgba(10,240,255,.04); border:1px solid var(--line);
+    padding:6px 14px; border-radius:3px; transition:all .12s;
+  }
+  .lb-tab:hover{color:var(--ink);}
+  .lb-tab.active{color:#05070d; background:var(--cyan); border-color:var(--cyan); font-weight:700;}
+  .lb-name{
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.12em; color:var(--ink);
+    background:rgba(10,240,255,.04); border:1px solid var(--line); border-radius:3px;
+    padding:7px 12px; width:180px; outline:none; transition:border-color .12s;
+  }
+  .lb-name:focus{border-color:var(--cyan);}
+  .lb-name::placeholder{color:var(--ink-dim); letter-spacing:.12em;}
+  .lb-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .lb-table th{
+    font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:.18em; color:var(--ink-dim);
+    text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);
+  }
+  .lb-table td{padding:8px 10px; border-bottom:1px solid rgba(10,240,255,.08); color:var(--ink);}
+  .lb-table td.rank{font-family:'Orbitron',sans-serif; font-weight:700; color:var(--cyan); width:34px;}
+  .lb-table td.score{font-family:'Orbitron',sans-serif; font-weight:700;}
+  .lb-table td.meta{font-size:12px; color:var(--ink-dim);}
+  .lb-table tr.top1 td{color:var(--green);}
+  .lb-empty{
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.2em; color:var(--ink-dim);
+    text-align:center; padding:26px 0; border:1px dashed var(--line); border-radius:6px;
+  }
+  .lb-empty[hidden]{display:none;}
+
   /* ---------- routes footer ---------- */
   details{margin-top:34px; border:1px solid var(--line); border-radius:6px; background:rgba(10,16,26,.5);}
   summary{
@@ -151,6 +186,21 @@
 
   <div id="grid"></div>
 
+  <div class="rule"></div>
+
+  <div id="lbWrap">
+    <div class="lb-head">
+      <div class="lb-title mono">LEADERBOARD</div>
+      <div class="lb-tabs" id="lbTabs"></div>
+      <input id="playerName" class="lb-name" maxlength="20" placeholder="YOUR NAME" autocomplete="off">
+    </div>
+    <table class="lb-table" id="lbTable">
+      <thead><tr><th>#</th><th>PLAYER</th><th>SCORE</th><th>RUN</th></tr></thead>
+      <tbody id="lbBody"></tbody>
+    </table>
+    <div class="lb-empty" id="lbEmpty">NO SCORES YET — BE THE FIRST</div>
+  </div>
+
   <details>
     <summary>CLUSTER ROUTES</summary>
     <div class="routes" id="routes"></div>
@@ -199,6 +249,13 @@ const GAMES = [
     tag: 'RUNNER', accent: '#ff9933', mono: 'IR',
     service: 'indian-road-runner.default.svc.cluster.local',
     bestKey: 'irr_best', bestFmt: (v) => '₹' + (+v).toLocaleString('en-IN'),
+  },
+  {
+    id: 'mars', path: '/g/mars/', name: 'MARS: LAST ROVER',
+    desc: 'Pilot the last rover across Mars. Dodge storms, harvest water and minerals, loop the crater.',
+    tag: 'SURVIVAL', accent: '#ff5a3c', mono: 'ML',
+    service: 'mars-last-rover.default.svc.cluster.local',
+    bestKey: 'marsBestScore', bestFmt: (v) => 'SCORE ' + (+v).toLocaleString('en-IN'),
   },
 ];
 
@@ -333,10 +390,80 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !player.hidden) closePlayer();
 });
 
+/* ---------- leaderboard ---------- */
+const lbTabs = el('lbTabs');
+const lbBody = el('lbBody');
+const lbEmpty = el('lbEmpty');
+const playerName = el('playerName');
+let lbGame = GAMES[0].id;
+
+function lbName() {
+  const v = (playerName.value || '').trim();
+  if (v) localStorage.setItem('arcade_name', v);
+  return v || localStorage.getItem('arcade_name') || 'PLAYER';
+}
+playerName.value = localStorage.getItem('arcade_name') || '';
+playerName.addEventListener('change', () => lbName());
+
+function fmtScore(g, v) {
+  if (g.id === 'runner') return '₹' + (+v).toLocaleString('en-IN');
+  if (g.id === 'unbreakable') return 'WAVE ' + v;
+  return (+v).toLocaleString('en-IN');
+}
+
+function renderLbTabs() {
+  lbTabs.textContent = '';
+  for (const g of GAMES) {
+    const b = document.createElement('button');
+    b.className = 'lb-tab' + (g.id === lbGame ? ' active' : '');
+    b.textContent = g.name;
+    b.addEventListener('click', () => { lbGame = g.id; loadLeaderboard(); });
+    lbTabs.appendChild(b);
+  }
+}
+
+async function loadLeaderboard() {
+  const g = GAMES.find((x) => x.id === lbGame);
+  renderLbTabs();
+  lbBody.textContent = '';
+  lbEmpty.hidden = false;
+  try {
+    const res = await fetch('/api/leaderboard/' + g.id + '?limit=10');
+    const data = await res.json();
+    const scores = (data && data.scores) || [];
+    lbEmpty.hidden = scores.length > 0;
+    scores.forEach((s, i) => {
+      const tr = document.createElement('tr');
+      if (i === 0) tr.className = 'top1';
+      const rank = document.createElement('td');
+      rank.className = 'rank';
+      rank.textContent = '#' + (i + 1);
+      const name = document.createElement('td');
+      name.textContent = s.name;
+      const score = document.createElement('td');
+      score.className = 'score';
+      score.textContent = fmtScore(g, s.score);
+      const meta = document.createElement('td');
+      meta.className = 'meta';
+      meta.textContent = s.meta || '';
+      tr.appendChild(rank);
+      tr.appendChild(name);
+      tr.appendChild(score);
+      tr.appendChild(meta);
+      lbBody.appendChild(tr);
+    });
+  } catch (e) {
+    lbEmpty.hidden = false;
+    lbEmpty.textContent = 'LEADERBOARD UNREACHABLE';
+  }
+}
+
 /* ---------- boot ---------- */
 renderCards();
 renderRoutes();
 probeAll();
 setInterval(probeAll, 30000);
+loadLeaderboard();
+setInterval(loadLeaderboard, 30000);
 </script>
 </html>
