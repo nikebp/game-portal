@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: game-portal
+  labels:
+    app: game-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: game-portal
+  template:
+    metadata:
+      labels:
+        app: game-portal
+    spec:
+      containers:
+        - name: game-portal
+          image: ghcr.io/nikebp/game-portal:sha-000000
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              cpu: 300m
+              memory: 96Mi

@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCADE — Game Portal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root{
+    --void:#07090f;
+    --panel:#0d1420;
+    --panel-2:#111a2a;
+    --line:rgba(10,240,255,.22);
+    --cyan:#0af0ff;
+    --ink:#e8f6ff;
+    --ink-dim:#7fa4b8;
+    --green:#2fd66b;
+    --red:#ff4b2e;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(10,60,80,.35), transparent 55%),
+      var(--void);
+    color:var(--ink);
+    font-family:'Rajdhani',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'Orbitron',sans-serif;}
+
+  .wrap{max-width:1060px; margin:0 auto; padding:34px 20px 60px;}
+
+  /* ---------- header ---------- */
+  header{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:8px;}
+  h1{
+    font-family:'Orbitron',sans-serif; font-weight:900; letter-spacing:.1em;
+    font-size:clamp(30px,5vw,46px); margin:0; line-height:1;
+    background:linear-gradient(180deg,#eafcff,var(--cyan) 60%,#0074a8);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 34px rgba(10,240,255,.3);
+  }
+  .tagline{font-size:14px; letter-spacing:.26em; color:var(--ink-dim); margin-top:8px;}
+  #onlineSummary{
+    font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:.14em;
+    color:var(--ink-dim); padding:8px 14px; border:1px solid var(--line);
+    background:rgba(10,20,30,.5); clip-path:polygon(3% 0,100% 0,97% 100%,0 100%);
+  }
+  #onlineSummary b{color:var(--green);}
+
+  .rule{height:1px; background:linear-gradient(90deg,transparent,var(--line),transparent); margin:22px 0 30px;}
+
+  /* ---------- game cards ---------- */
+  #grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px;}
+
+  .card{
+    background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--line); border-radius:6px; padding:20px 20px 18px;
+    display:flex; flex-direction:column; gap:12px; position:relative; overflow:hidden;
+    transition:transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+  }
+  .card::before{
+    content:''; position:absolute; inset:0 auto 0 0; width:3px;
+    background:var(--accent); box-shadow:0 0 14px var(--accent);
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 8px 30px rgba(0,0,0,.45);}
+
+  .card-top{display:flex; align-items:center; gap:14px;}
+  .tile{
+    width:54px; height:54px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:'Orbitron',sans-serif; font-weight:900; font-size:19px; color:#05070d;
+    background:var(--accent); border-radius:6px; box-shadow:0 0 18px color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  .card-name{font-family:'Orbitron',sans-serif; font-weight:700; font-size:16px; letter-spacing:.06em; line-height:1.25;}
+  .chip{
+    display:inline-block; margin-top:5px; font-size:10px; letter-spacing:.2em;
+    color:var(--accent); border:1px solid var(--accent); padding:2px 8px; border-radius:3px;
+  }
+  .card-desc{font-size:14px; color:var(--ink-dim); line-height:1.55; min-height:44px;}
+
+  .card-meta{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto;}
+  .best{font-size:12px; letter-spacing:.08em; color:var(--ink-dim);}
+  .best b{color:var(--ink); font-family:'Orbitron',sans-serif; font-size:12px;}
+  .status{display:flex; align-items:center; gap:6px; font-family:'Orbitron',sans-serif; font-size:10px; letter-spacing:.16em; color:var(--ink-dim);}
+  .dot{width:8px; height:8px; border-radius:50%; background:#556; transition:background .3s, box-shadow .3s;}
+  .status.online .dot{background:var(--green); box-shadow:0 0 8px var(--green);}
+  .status.online{color:var(--green);}
+  .status.offline .dot{background:var(--red); box-shadow:0 0 8px var(--red);}
+  .status.offline{color:var(--red);}
+
+  .play{
+    font-family:'Orbitron',sans-serif; font-size:13px; letter-spacing:.16em; cursor:pointer;
+    color:#05070d; background:var(--accent); border:none; padding:11px 22px;
+    clip-path:polygon(5% 0,100% 0,95% 100%,0 100%);
+    transition:filter .12s, transform .12s; width:100%;
+  }
+  .play:hover{filter:brightness(1.18); transform:translateY(-1px);}
+  .play:disabled{filter:grayscale(1) brightness(.6); cursor:not-allowed; transform:none;}
+
+  /* ---------- routes footer ---------- */
+  details{margin-top:34px; border:1px solid var(--line); border-radius:6px; background:rgba(10,16,26,.5);}
+  summary{
+    cursor:pointer; padding:12px 16px; font-family:'Orbitron',sans-serif;
+    font-size:11px; letter-spacing:.2em; color:var(--ink-dim); list-style:none;
+  }
+  summary:hover{color:var(--cyan);}
+  .routes{padding:4px 16px 14px; font-size:13px; color:var(--ink-dim); line-height:1.9;}
+  .routes code{color:var(--cyan); font-family:monospace; background:rgba(10,240,255,.07); padding:1px 6px; border-radius:3px;}
+
+  footer{margin-top:26px; text-align:center; font-size:11px; letter-spacing:.18em; color:#3d5261;}
+
+  /* ---------- player overlay ---------- */
+  #player{
+    position:fixed; inset:0; z-index:50; background:rgba(3,6,10,.94);
+    display:flex; flex-direction:column;
+  }
+  #player[hidden]{display:none!important;}
+  .player-bar{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel);
+    flex:none;
+  }
+  .player-title{font-family:'Orbitron',sans-serif; font-size:14px; letter-spacing:.14em; color:var(--cyan);}
+  .player-actions{display:flex; gap:10px;}
+  .pbtn{
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.14em; cursor:pointer;
+    color:var(--ink); background:rgba(10,240,255,.08); border:1px solid var(--line);
+    padding:8px 16px; clip-path:polygon(4% 0,100% 0,96% 100%,0 100%);
+    transition:background .12s;
+  }
+  .pbtn:hover{background:rgba(10,240,255,.2);}
+  .pbtn.exit{color:#05070d; background:var(--cyan); border-color:var(--cyan); font-weight:700;}
+  #playerFrame{flex:1; width:100%; border:none; background:#000;}
+
+  @media (max-width:560px){
+    .wrap{padding:22px 12px 40px;}
+    .card-desc{min-height:0;}
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>ARCADE</h1>
+      <div class="tagline">ONE DASHBOARD — EVERY GAME</div>
+    </div>
+    <div id="onlineSummary">PROBING FLEET…</div>
+  </header>
+  <div class="rule"></div>
+
+  <div id="grid"></div>
+
+  <details>
+    <summary>CLUSTER ROUTES</summary>
+    <div class="routes" id="routes"></div>
+  </details>
+
+  <footer>SERVED BY GAME-PORTAL — NGINX REVERSE PROXY INSIDE THE CLUSTER</footer>
+</div>
+
+<div id="player" hidden>
+  <div class="player-bar">
+    <div class="player-title mono" id="playerTitle">GAME</div>
+    <div class="player-actions">
+      <button class="pbtn" id="btnNewTab">OPEN IN NEW TAB</button>
+      <button class="pbtn exit" id="btnBack">BACK TO ARCADE</button>
+    </div>
+  </div>
+  <iframe id="playerFrame" allow="fullscreen; pointer-lock; autoplay; gamepad" title="game"></iframe>
+</div>
+
+<script>
+'use strict';
+/* =========================================================================
+   ARCADE — the game-cluster portal. One dashboard that lists every game,
+   probes each service live, shows best runs (the games share this origin
+   through the reverse proxy, so their localStorage is readable here), and
+   plays any game inline in an embedded frame.
+   ========================================================================= */
+
+const GAMES = [
+  {
+    id: 'snake', path: '/g/snake/', name: 'SNAKE',
+    desc: 'The classic that started this cluster. Eat, grow, and do not bite yourself.',
+    tag: 'ARCADE', accent: '#00cc66', mono: 'SN',
+    service: 'game.default.svc.cluster.local', bestKey: null, bestFmt: null,
+  },
+  {
+    id: 'unbreakable', path: '/g/unbreakable/', name: 'HUMAN: UNBREAKABLE',
+    desc: 'The last human operative against waves of machines. Knife, armor, finishers.',
+    tag: 'ACTION', accent: '#0af0ff', mono: 'HU',
+    service: 'human-unbreakable.default.svc.cluster.local',
+    bestKey: 'hu_bestWave', bestFmt: (v) => 'WAVE ' + v,
+  },
+  {
+    id: 'runner', path: '/g/runner/', name: 'INDIAN ROAD RUNNER',
+    desc: 'Sprint against oncoming autos, buses and cows. Jump, slide, collect rupees.',
+    tag: 'RUNNER', accent: '#ff9933', mono: 'IR',
+    service: 'indian-road-runner.default.svc.cluster.local',
+    bestKey: 'irr_best', bestFmt: (v) => '₹' + (+v).toLocaleString('en-IN'),
+  },
+];
+
+const el = (id) => document.getElementById(id);
+const grid = el('grid');
+const cardEls = {};
+
+function bestLine(g) {
+  if (!g.bestKey) return 'BEST <b>—</b>';
+  const v = parseInt(localStorage.getItem(g.bestKey) || '0', 10);
+  return v > 0 ? 'BEST <b>' + g.bestFmt(v) + '</b>' : 'BEST <b>NO RUNS YET</b>';
+}
+
+function renderCards() {
+  for (const g of GAMES) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.setProperty('--accent', g.accent);
+
+    const top = document.createElement('div');
+    top.className = 'card-top';
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.textContent = g.mono;
+    const nameWrap = document.createElement('div');
+    const name = document.createElement('div');
+    name.className = 'card-name';
+    name.textContent = g.name;
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = g.tag;
+    nameWrap.appendChild(name);
+    nameWrap.appendChild(chip);
+    top.appendChild(tile);
+    top.appendChild(nameWrap);
+
+    const desc = document.createElement('div');
+    desc.className = 'card-desc';
+    desc.textContent = g.desc;
+
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    const best = document.createElement('div');
+    best.className = 'best';
+    best.innerHTML = bestLine(g);
+    const status = document.createElement('div');
+    status.className = 'status';
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    const stTxt = document.createElement('span');
+    stTxt.textContent = 'PROBING';
+    status.appendChild(dot);
+    status.appendChild(stTxt);
+
+    meta.appendChild(best);
+    meta.appendChild(status);
+
+    const play = document.createElement('button');
+    play.className = 'play';
+    play.textContent = 'PLAY';
+    play.addEventListener('click', () => openPlayer(g));
+
+    card.appendChild(top);
+    card.appendChild(desc);
+    card.appendChild(meta);
+    card.appendChild(play);
+    grid.appendChild(card);
+    cardEls[g.id] = { card, status, stTxt, best, play };
+  }
+}
+
+function renderRoutes() {
+  const r = el('routes');
+  r.textContent = '';
+  for (const g of GAMES) {
+    const line = document.createElement('div');
+    const code = document.createElement('code');
+    code.textContent = g.path;
+    line.appendChild(code);
+    line.appendChild(document.createTextNode('  →  ' + g.service + ':80'));
+    r.appendChild(line);
+  }
+}
+
+function probeAll() {
+  let online = 0, done = 0;
+  const summary = el('onlineSummary');
+  summary.textContent = 'PROBING FLEET…';
+  for (const g of GAMES) {
+    const ui = cardEls[g.id];
+    fetch(g.path, { method: 'HEAD' })
+      .then((res) => { setStatus(g, res.ok); })
+      .catch(() => { setStatus(g, false); });
+  }
+  function setStatus(g, ok) {
+    const ui = cardEls[g.id];
+    ui.status.className = 'status ' + (ok ? 'online' : 'offline');
+    ui.stTxt.textContent = ok ? 'ONLINE' : 'OFFLINE';
+    ui.play.disabled = !ok;
+    done++; if (ok) online++;
+    if (done === GAMES.length) {
+      summary.innerHTML = '<b>' + online + '</b> / ' + GAMES.length + ' GAMES ONLINE';
+    }
+  }
+}
+
+/* ---------- embedded player ---------- */
+const player = el('player');
+const playerFrame = el('playerFrame');
+const playerTitle = el('playerTitle');
+
+function openPlayer(g) {
+  playerTitle.textContent = g.name;
+  playerFrame.src = g.path;
+  player.hidden = false;
+  el('btnNewTab').onclick = () => window.open(g.path, '_blank');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayer() {
+  playerFrame.src = 'about:blank'; // unloads the game
+  player.hidden = true;
+  document.body.style.overflow = '';
+  // bests may have changed during the run
+  for (const g of GAMES) {
+    if (g.bestKey) cardEls[g.id].best.innerHTML = bestLine(g);
+  }
+}
+
+el('btnBack').addEventListener('click', closePlayer);
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !player.hidden) closePlayer();
+});
+
+/* ---------- boot ---------- */
+renderCards();
+renderRoutes();
+probeAll();
+setInterval(probeAll, 30000);
+</script>
+</html>
