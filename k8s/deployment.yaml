@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: game-portal
-          image: ghcr.io/nikebp/game-portal:sha-d37892a
+          image: ghcr.io/nikebp/game-portal:sha-d51dc07
           ports:
             - containerPort: 80
           resources:
