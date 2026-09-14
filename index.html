@@ -168,6 +168,91 @@
   .pbtn.exit{color:#05070d; background:var(--cyan); border-color:var(--cyan); font-weight:700;}
   #playerFrame{flex:1; width:100%; border:none; background:#000;}
 
+  /* ---------- share ---------- */
+  .share-wrap{margin-top:30px;}
+  .share-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .share-title{font-size:13px; letter-spacing:.24em; color:var(--cyan);}
+  .share-sub{font-size:12px; color:var(--ink-dim); letter-spacing:.08em;}
+  .share-btns{display:flex; gap:12px; flex-wrap:wrap;}
+  .share-btn{
+    display:flex; align-items:center; gap:8px; cursor:pointer;
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.12em;
+    color:var(--ink); background:rgba(10,240,255,.06); border:1px solid var(--line);
+    padding:10px 18px; border-radius:4px; transition:all .14s; text-decoration:none;
+  }
+  .share-btn:hover{background:rgba(10,240,255,.18); border-color:var(--cyan); transform:translateY(-2px);}
+  .share-btn.wa:hover{border-color:#25d366; color:#25d366;}
+  .share-btn.x:hover{border-color:#fff; color:#fff;}
+  .share-btn.ig:hover{border-color:#e1306c; color:#e1306c;}
+  .share-toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--panel-2); border:1px solid var(--cyan); color:var(--cyan);
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.14em;
+    padding:12px 22px; border-radius:4px; z-index:60; opacity:0; transition:opacity .3s;
+    pointer-events:none;
+  }
+  .share-toast.show{opacity:1;}
+
+  /* ---------- feedback section ---------- */
+  .fb-wrap{margin-top:30px; border:1px solid var(--line); border-radius:6px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); padding:24px;}
+  .fb-title{font-family:'Orbitron',sans-serif; font-size:14px; letter-spacing:.14em; color:var(--cyan); margin-bottom:6px;}
+  .fb-msg{font-size:14px; color:var(--ink-dim); line-height:1.6; margin-bottom:16px;}
+  .fb-msg b{color:var(--ink);}
+  .fb-area{
+    width:100%; min-height:90px; resize:vertical;
+    background:rgba(10,16,26,.6); border:1px solid var(--line); border-radius:4px;
+    color:var(--ink); font-family:'Rajdhani',sans-serif; font-size:14px; padding:12px;
+    outline:none; transition:border-color .14s;
+  }
+  .fb-area:focus{border-color:var(--cyan);}
+  .fb-area::placeholder{color:var(--ink-dim);}
+  .fb-submit{
+    margin-top:14px; font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:.16em;
+    cursor:pointer; color:#05070d; background:var(--cyan); border:none; padding:11px 28px;
+    clip-path:polygon(5% 0,100% 0,95% 100%,0 100%); transition:filter .12s, transform .12s;
+  }
+  .fb-submit:hover{filter:brightness(1.18); transform:translateY(-1px);}
+  .fb-thanks{
+    margin-top:14px; font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:.12em;
+    color:var(--green); padding:12px 16px; border:1px solid var(--green); border-radius:4px;
+    background:rgba(47,214,107,.06); display:none;
+  }
+  .fb-thanks.show{display:block;}
+
+  /* ---------- feedback prompt (post-game) ---------- */
+  #fbPrompt{
+    position:fixed; inset:0; z-index:55; background:rgba(3,6,10,.92);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #fbPrompt[hidden]{display:none!important;}
+  .fb-prompt-box{
+    max-width:460px; width:100%; background:linear-gradient(180deg,var(--panel-2),var(--panel));
+    border:1px solid var(--cyan); border-radius:8px; padding:28px; text-align:center;
+    box-shadow:0 0 40px rgba(10,240,255,.15);
+  }
+  .fb-prompt-title{font-family:'Orbitron',sans-serif; font-size:16px; letter-spacing:.1em; color:var(--cyan); margin-bottom:10px;}
+  .fb-prompt-msg{font-size:14px; color:var(--ink-dim); line-height:1.6; margin-bottom:18px;}
+  .fb-prompt-msg b{color:var(--ink);}
+  .fb-prompt-area{
+    width:100%; min-height:80px; resize:vertical;
+    background:rgba(10,16,26,.6); border:1px solid var(--line); border-radius:4px;
+    color:var(--ink); font-family:'Rajdhani',sans-serif; font-size:14px; padding:12px;
+    outline:none; transition:border-color .14s; margin-bottom:14px;
+  }
+  .fb-prompt-area:focus{border-color:var(--cyan);}
+  .fb-prompt-area::placeholder{color:var(--ink-dim);}
+  .fb-prompt-btns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  .fb-prompt-btn{
+    font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:.14em; cursor:pointer;
+    padding:10px 22px; clip-path:polygon(4% 0,100% 0,96% 100%,0 100%); transition:all .12s; border:none;
+  }
+  .fb-prompt-btn.primary{color:#05070d; background:var(--cyan); font-weight:700;}
+  .fb-prompt-btn.primary:hover{filter:brightness(1.18);}
+  .fb-prompt-btn.secondary{color:var(--ink-dim); background:rgba(10,240,255,.06); border:1px solid var(--line);}
+  .fb-prompt-btn.secondary:hover{color:var(--ink); background:rgba(10,240,255,.14);}
+  .fb-prompt-thanks{font-family:'Orbitron',sans-serif; font-size:13px; letter-spacing:.1em; color:var(--green); margin-top:16px; display:none;}
+  .fb-prompt-thanks.show{display:block;}
+
   @media (max-width:560px){
     .wrap{padding:22px 12px 40px;}
     .card-desc{min-height:0;}
@@ -201,10 +286,30 @@
     <div class="lb-empty" id="lbEmpty">NO SCORES YET — BE THE FIRST</div>
   </div>
 
+  <div class="share-wrap">
+    <div class="share-head">
+      <div class="share-title mono">SHARE ARCADE</div>
+      <div class="share-sub">Tell your friends — spread the word</div>
+    </div>
+    <div class="share-btns">
+      <a class="share-btn wa" id="shareWa" href="#">WhatsApp</a>
+      <a class="share-btn x" id="shareX" href="#">X / TWITTER</a>
+      <a class="share-btn ig" id="shareIg" href="#">Instagram</a>
+    </div>
+  </div>
+
   <details>
     <summary>CLUSTER ROUTES</summary>
     <div class="routes" id="routes"></div>
   </details>
+
+  <div class="fb-wrap">
+    <div class="fb-title mono">FEEDBACK</div>
+    <div class="fb-msg">We're improving this game every day! Drop your feedback and come back tomorrow for fresh updates.</div>
+    <textarea class="fb-area" id="fbText" placeholder="What did you think? What should we improve?"></textarea>
+    <button class="fb-submit" id="fbSubmit">SUBMIT FEEDBACK</button>
+    <div class="fb-thanks" id="fbThanks">Thanks for your feedback! We'll use it to make ARCADE even better. Come back tomorrow for new improvements.</div>
+  </div>
 
   <footer>SERVED BY GAME-PORTAL — NGINX REVERSE PROXY INSIDE THE CLUSTER</footer>
 </div>
@@ -219,6 +324,21 @@
   </div>
   <iframe id="playerFrame" allow="fullscreen; pointer-lock; autoplay; gamepad" title="game"></iframe>
 </div>
+
+<div id="fbPrompt" hidden>
+  <div class="fb-prompt-box">
+    <div class="fb-prompt-title mono">GAME OVER — HOW WAS IT?</div>
+    <div class="fb-prompt-msg">We're improving this game every day! Drop your feedback and come back tomorrow for fresh updates.</div>
+    <textarea class="fb-prompt-area" id="fbPromptText" placeholder="Tell us what you loved or what to improve..."></textarea>
+    <div class="fb-prompt-btns">
+      <button class="fb-prompt-btn primary" id="fbPromptSubmit">SUBMIT</button>
+      <button class="fb-prompt-btn secondary" id="fbPromptSkip">MAYBE LATER</button>
+    </div>
+    <div class="fb-prompt-thanks" id="fbPromptThanks">Thanks! Your feedback will shape tomorrow's update. Come back soon!</div>
+  </div>
+</div>
+
+<div class="share-toast" id="shareToast">COPIED TO CLIPBOARD</div>
 
 <script>
 'use strict';
@@ -366,8 +486,11 @@ function probeAll() {
 const player = el('player');
 const playerFrame = el('playerFrame');
 const playerTitle = el('playerTitle');
+let currentGame = null;
+function currentGameId() { return currentGame ? currentGame.id : 'portal'; }
 
 function openPlayer(g) {
+  currentGame = g;
   playerTitle.textContent = g.name;
   playerFrame.src = g.path;
   player.hidden = false;
@@ -383,6 +506,8 @@ function closePlayer() {
   for (const g of GAMES) {
     if (g.bestKey) cardEls[g.id].best.innerHTML = bestLine(g);
   }
+  // prompt feedback after every game session
+  showFeedbackPrompt();
 }
 
 el('btnBack').addEventListener('click', closePlayer);
@@ -457,6 +582,93 @@ async function loadLeaderboard() {
     lbEmpty.textContent = 'LEADERBOARD UNREACHABLE';
   }
 }
+
+/* ---------- share ---------- */
+const SHARE_TEXT = 'Check out ARCADE — 4 free browser games with leaderboards!';
+const SHARE_URL = window.location.href;
+const SHARE_FULL = SHARE_TEXT + ' ' + SHARE_URL;
+
+el('shareWa').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.open('https://wa.me/?text=' + encodeURIComponent(SHARE_FULL), '_blank');
+});
+
+el('shareX').addEventListener('click', (e) => {
+  e.preventDefault();
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(SHARE_TEXT) + '&url=' + encodeURIComponent(SHARE_URL), '_blank');
+});
+
+el('shareIg').addEventListener('click', async (e) => {
+  e.preventDefault();
+  try {
+    await navigator.clipboard.writeText(SHARE_FULL);
+    showShareToast('COPIED TO CLIPBOARD — PASTE IN INSTAGRAM');
+  } catch (err) {
+    // fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = SHARE_FULL;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showShareToast('COPIED TO CLIPBOARD — PASTE IN INSTAGRAM'); }
+    catch (_) { showShareToast('COPY FAILED — PLEASE COPY MANUALLY'); }
+    document.body.removeChild(ta);
+  }
+});
+
+function showShareToast(msg) {
+  const t = el('shareToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ---------- feedback section ---------- */
+async function submitFeedback(text, game) {
+  if (!text) return;
+  try {
+    const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, game: game || 'portal' }),
+    });
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+el('fbSubmit').addEventListener('click', async () => {
+  const text = el('fbText').value.trim();
+  if (!text) return;
+  const ok = await submitFeedback(text, 'portal');
+  if (ok) {
+    el('fbThanks').classList.add('show');
+    el('fbText').value = '';
+  }
+});
+
+/* ---------- feedback prompt (post-game) ---------- */
+function showFeedbackPrompt() {
+  el('fbPromptText').value = '';
+  el('fbPromptThanks').classList.remove('show');
+  el('fbPrompt').hidden = false;
+}
+
+function closeFeedbackPrompt() {
+  el('fbPrompt').hidden = true;
+}
+
+el('fbPromptSubmit').addEventListener('click', async () => {
+  const text = el('fbPromptText').value.trim();
+  if (!text) return;
+  const ok = await submitFeedback(text, currentGameId());
+  if (ok) {
+    el('fbPromptThanks').classList.add('show');
+    setTimeout(closeFeedbackPrompt, 2000);
+  }
+});
+
+el('fbPromptSkip').addEventListener('click', closeFeedbackPrompt);
 
 /* ---------- boot ---------- */
 renderCards();
